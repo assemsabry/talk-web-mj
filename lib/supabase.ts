@@ -477,26 +477,32 @@ export const parseContent = (content: string) => {
     .replace(/#(\w+)/g, '<span class="hashtag" onclick="window.location.href=\'/search?q=%23$1\'">#$1</span>')
 }
 
-// Authentication helpers
+// Authentication helpers with real Supabase integration
 export const signUp = async (email: string, password: string, userData: any) => {
   if (!supabase) throw new Error("Supabase not configured")
 
-  return await supabase.auth.signUp({
+  // Real signup with email confirmation
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: userData,
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
   })
+
+  return { data, error }
 }
 
 export const signIn = async (email: string, password: string) => {
   if (!supabase) throw new Error("Supabase not configured")
 
-  return await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
+
+  return { data, error }
 }
 
 export const signOut = async () => {
@@ -514,6 +520,59 @@ export const getCurrentUser = async () => {
   return user
 }
 
+// OTP verification for signup
+export const verifyOtp = async (email: string, token: string, type: "signup" | "recovery" = "signup") => {
+  if (!supabase) throw new Error("Supabase not configured")
+
+  const { data, error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type,
+  })
+
+  return { data, error }
+}
+
+// Resend OTP
+export const resendOtp = async (email: string, type: "signup" | "recovery" = "signup") => {
+  if (!supabase) throw new Error("Supabase not configured")
+
+  const { data, error } = await supabase.auth.resend({
+    type,
+    email,
+    options: {
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
+    },
+  })
+
+  return { data, error }
+}
+
+// Get user profile
+export const getUserProfile = async (userId: string) => {
+  if (!supabase) return null
+
+  const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single()
+
+  return { data, error }
+}
+
+// Create user profile after signup
+export const createUserProfile = async (userId: string, profileData: any) => {
+  if (!supabase) throw new Error("Supabase not configured")
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .insert({
+      id: userId,
+      ...profileData,
+    })
+    .select()
+    .single()
+
+  return { data, error }
+}
+
 export const uploadFile = async (file: File, bucket: string, path: string) => {
   if (!supabase) throw new Error("Supabase not configured")
 
@@ -524,4 +583,121 @@ export const getPublicUrl = (bucket: string, path: string) => {
   if (!supabase) return null
 
   return supabase.storage.from(bucket).getPublicUrl(path)
+}
+
+// Real post creation function
+export const createPost = async (content: string, imageUrls?: string[], videoUrl?: string, pollData?: any) => {
+  if (!supabase) {
+    // Simulate post creation for demo
+    const newPost = {
+      id: Math.random().toString(36).substring(2),
+      content,
+      image_urls: imageUrls || null,
+      video_url: videoUrl || null,
+      poll_id: pollData ? Math.random().toString(36).substring(2) : null,
+      created_at: new Date().toISOString(),
+      likes_count: 0,
+      comments_count: 0,
+      reposts_count: 0,
+      profiles: {
+        username: "assem",
+        full_name: "Assem Sabry",
+        title: "AI Engineer",
+        avatar_url: "/talk-logo.png",
+        verified: true,
+      },
+    }
+
+    // Add to fallback posts
+    fallbackPosts.unshift(newPost)
+    return { data: newPost, error: null }
+  }
+
+  const user = await getCurrentUser()
+  if (!user) throw new Error("User not authenticated")
+
+  const { data, error } = await supabase
+    .from("posts")
+    .insert({
+      user_id: user.id,
+      content,
+      image_urls: imageUrls,
+      video_url: videoUrl,
+      poll_id: pollData?.id,
+    })
+    .select(`
+      *,
+      profiles:user_id (
+        username,
+        full_name,
+        avatar_url,
+        verified,
+        title
+      )
+    `)
+    .single()
+
+  return { data, error }
+}
+
+// Real poll creation function
+export const createPoll = async (postId: string, pollData: any) => {
+  if (!supabase) {
+    return { data: { id: Math.random().toString(36).substring(2) }, error: null }
+  }
+
+  const expiresAt = pollData.expiresIn ? new Date(Date.now() + pollData.expiresIn * 60 * 60 * 1000).toISOString() : null
+
+  const { data, error } = await supabase
+    .from("polls")
+    .insert({
+      post_id: postId,
+      question: pollData.question,
+      options: pollData.options.map((text: string, index: number) => ({ text, votes: 0, index })),
+      multiple_choice: pollData.multipleChoice,
+      expires_at: expiresAt,
+    })
+    .select()
+    .single()
+
+  return { data, error }
+}
+
+// Update profile function
+export const updateProfile = async (profileData: any) => {
+  if (!supabase) {
+    return { data: profileData, error: null }
+  }
+
+  const user = await getCurrentUser()
+  if (!user) throw new Error("User not authenticated")
+
+  const { data, error } = await supabase.from("profiles").update(profileData).eq("id", user.id).select().single()
+
+  return { data, error }
+}
+
+// Get posts with real-time updates
+export const getPosts = async (limit = 20, offset = 0) => {
+  if (!supabase) {
+    return { data: fallbackPosts, error: null }
+  }
+
+  const { data, error } = await supabase
+    .from("posts")
+    .select(`
+      *,
+      profiles:user_id (
+        username,
+        full_name,
+        avatar_url,
+        verified,
+        title
+      ),
+      polls (*)
+    `)
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1)
+
+  return { data, error }
 }

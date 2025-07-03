@@ -9,10 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, ArrowRight, User, Calendar, FileText, Award } from "lucide-react"
+import { ArrowLeft, ArrowRight, User, Calendar, FileText, Award, Mail } from "lucide-react"
 import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
-import { USER_TITLES, type UserTitle } from "@/lib/supabase"
+import { USER_TITLES, type UserTitle, signUp, verifyOtp, resendOtp, createUserProfile } from "@/lib/supabase"
 import { useToast } from "@/hooks/use-toast"
 
 export default function SignUpPage() {
@@ -27,6 +27,7 @@ export default function SignUpPage() {
   const [title, setTitle] = useState<UserTitle>("Other")
   const [birthDate, setBirthDate] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
@@ -65,13 +66,36 @@ export default function SignUpPage() {
       return
     }
 
-    setStep(3) // Go to OTP step
+    setIsLoading(true)
 
-    // Simulate sending OTP
-    toast({
-      title: "Verification code sent",
-      description: "Please check your email for the verification code.",
-    })
+    try {
+      // Create account with Supabase
+      const { data, error } = await signUp(email, password, {
+        username: email.split("@")[0], // temporary username
+        full_name: email.split("@")[0],
+      })
+
+      if (error) {
+        throw error
+      }
+
+      if (data.user) {
+        setUserId(data.user.id)
+        setStep(3) // Go to OTP step
+        toast({
+          title: "Verification code sent",
+          description: "Please check your email for the verification code.",
+        })
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create account. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
@@ -86,8 +110,53 @@ export default function SignUpPage() {
       return
     }
 
-    // For demo purposes, accept any 6-digit code
-    setStep(4) // Go to profile setup
+    setIsLoading(true)
+
+    try {
+      const { data, error } = await verifyOtp(email, otp, "signup")
+
+      if (error) {
+        throw error
+      }
+
+      if (data.user) {
+        setUserId(data.user.id)
+        setStep(4) // Go to profile setup
+        toast({
+          title: "Email verified!",
+          description: "Now let's complete your profile.",
+        })
+      }
+    } catch (error: any) {
+      toast({
+        title: "Invalid verification code",
+        description: error.message || "Please check your code and try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleResendOtp = async () => {
+    try {
+      const { error } = await resendOtp(email, "signup")
+
+      if (error) {
+        throw error
+      }
+
+      toast({
+        title: "Code resent",
+        description: "A new verification code has been sent to your email.",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to resend code.",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleProfileSubmit = async (e: React.FormEvent) => {
@@ -106,17 +175,30 @@ export default function SignUpPage() {
         return
       }
 
-      // Simulate account creation
-      const userData = {
+      if (!userId) {
+        throw new Error("User ID not found")
+      }
+
+      // Create user profile
+      const profileData = {
         username,
         full_name: fullName,
         bio,
         title,
         birth_date: birthDate,
+        avatar_url: null,
+        banner_url: null,
+        verified: false,
+        followers_count: 0,
+        following_count: 0,
+        posts_count: 0,
       }
 
-      // In real implementation, this would create the account
-      // const { data, error } = await signUp(email, password, userData)
+      const { data, error } = await createUserProfile(userId, profileData)
+
+      if (error) {
+        throw error
+      }
 
       toast({
         title: "Account created successfully!",
@@ -127,7 +209,7 @@ export default function SignUpPage() {
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to create account. Please try again.",
+        description: error.message || "Failed to create profile. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -142,14 +224,18 @@ export default function SignUpPage() {
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
             </div>
             <Button type="submit" className="w-full liquid-button gradient-bg text-white">
               Continue <ArrowRight className="ml-2 h-4 w-4" />
@@ -165,10 +251,11 @@ export default function SignUpPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a password"
+                placeholder="Create a password (min 6 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
               />
             </div>
             <div className="space-y-2">
@@ -180,10 +267,11 @@ export default function SignUpPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                minLength={6}
               />
             </div>
-            <Button type="submit" className="w-full liquid-button gradient-bg text-white">
-              Send Verification Code <ArrowRight className="ml-2 h-4 w-4" />
+            <Button type="submit" className="w-full liquid-button gradient-bg text-white" disabled={isLoading}>
+              {isLoading ? "Creating Account..." : "Create Account"} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </form>
         )
@@ -195,6 +283,7 @@ export default function SignUpPage() {
               <p className="text-sm text-muted-foreground">
                 We sent a verification code to <strong>{email}</strong>
               </p>
+              <p className="text-xs text-muted-foreground mt-2">Check your inbox and spam folder</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="otp">Verification Code</Label>
@@ -205,18 +294,14 @@ export default function SignUpPage() {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 className="text-center text-2xl tracking-widest"
+                maxLength={6}
                 required
               />
             </div>
-            <Button type="submit" className="w-full liquid-button gradient-bg text-white">
-              Verify Code <ArrowRight className="ml-2 h-4 w-4" />
+            <Button type="submit" className="w-full liquid-button gradient-bg text-white" disabled={isLoading}>
+              {isLoading ? "Verifying..." : "Verify Code"} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full"
-              onClick={() => toast({ title: "Code resent", description: "A new verification code has been sent." })}
-            >
+            <Button type="button" variant="ghost" className="w-full" onClick={handleResendOtp}>
               Resend Code
             </Button>
           </form>
@@ -237,6 +322,7 @@ export default function SignUpPage() {
                   onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
                   className="pl-10"
                   required
+                  minLength={3}
                 />
               </div>
             </div>
@@ -297,12 +383,14 @@ export default function SignUpPage() {
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   className="pl-10 min-h-[80px]"
+                  maxLength={160}
                 />
               </div>
+              <p className="text-xs text-muted-foreground">{bio.length}/160 characters</p>
             </div>
 
             <Button type="submit" className="w-full liquid-button gradient-bg text-white" disabled={isLoading}>
-              {isLoading ? "Creating Account..." : "Create Account"} <ArrowRight className="ml-2 h-4 w-4" />
+              {isLoading ? "Creating Profile..." : "Complete Setup"} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </form>
         )
