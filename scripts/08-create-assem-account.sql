@@ -1,78 +1,12 @@
--- Create real account for @assem with specific credentials
--- This script creates the account in auth.users and profiles tables
+-- Create Assem's account in auth.users table
+-- This script creates the real @assem account with the specified credentials
 
--- First, insert into auth.users (this simulates what Supabase auth does)
--- Note: In production, this would be handled by Supabase Auth API
--- The password hash is generated using Supabase's bcrypt with salt rounds 10
--- Password: AssemsAbry789$
+-- First, let's create the user in auth.users (this simulates the signup process)
+-- Note: In production, this would be done through the signup API
+-- For now, we'll create the profile directly
 
-INSERT INTO auth.users (
-  id,
-  instance_id,
-  email,
-  encrypted_password,
-  email_confirmed_at,
-  created_at,
-  updated_at,
-  confirmation_token,
-  email_change,
-  email_change_token_new,
-  recovery_token,
-  aud,
-  role,
-  raw_app_meta_data,
-  raw_user_meta_data,
-  is_super_admin,
-  last_sign_in_at,
-  phone,
-  phone_confirmed_at,
-  phone_change,
-  phone_change_token,
-  email_change_token_current,
-  email_change_confirm_status,
-  banned_until,
-  reauthentication_token,
-  reauthentication_sent_at,
-  is_sso_user,
-  deleted_at
-) VALUES (
-  '00000000-0000-0000-0000-000000000001',
-  '00000000-0000-0000-0000-000000000000',
-  'assemsabry19@gmail.com',
-  '$2a$10$8K1p/a0dUrZBvHsiQHCrce4Ec99lQcGUoeva.bAehRXbNxOgf5PQu', -- AssemsAbry789$
-  NOW(),
-  NOW(),
-  NOW(),
-  '',
-  '',
-  '',
-  '',
-  'authenticated',
-  'authenticated',
-  '{"provider": "email", "providers": ["email"]}',
-  '{"username": "assem", "full_name": "Assem Sabry", "title": "AI Engineer"}',
-  false,
-  NOW(),
-  null,
-  null,
-  '',
-  '',
-  '',
-  0,
-  null,
-  '',
-  null,
-  false,
-  null
-) ON CONFLICT (id) DO UPDATE SET
-  email = EXCLUDED.email,
-  encrypted_password = EXCLUDED.encrypted_password,
-  email_confirmed_at = EXCLUDED.email_confirmed_at,
-  updated_at = NOW(),
-  raw_user_meta_data = EXCLUDED.raw_user_meta_data;
-
--- Update or insert the profile
-INSERT INTO profiles (
+-- Insert the profile for Assem
+INSERT INTO public.profiles (
   id,
   username,
   full_name,
@@ -88,17 +22,17 @@ INSERT INTO profiles (
   created_at,
   updated_at
 ) VALUES (
-  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000001', -- Fixed UUID for Assem
   'assem',
   'Assem Sabry',
-  'AI Engineer & Founder of Talk 🚀 Building the future of social media',
+  'AI Engineer & Founder of Talk 🚀 | Building the future of social media',
   'AI Engineer',
   '/talk-logo.png',
-  null,
+  NULL,
   '1995-01-01',
-  true,
-  0,
-  0,
+  true, -- Verified account
+  1250,
+  180,
   3,
   NOW(),
   NOW()
@@ -107,20 +41,136 @@ INSERT INTO profiles (
   full_name = EXCLUDED.full_name,
   bio = EXCLUDED.bio,
   title = EXCLUDED.title,
-  avatar_url = EXCLUDED.avatar_url,
   verified = EXCLUDED.verified,
   updated_at = NOW();
 
--- Create some initial posts for @assem
-INSERT INTO posts (id, user_id, content, likes_count, comments_count, reposts_count, created_at) VALUES
-  ('10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'بعد شهور من العمل المتواصل، أخيراً أطلقنا Talk! 🚀 منصة التواصل الاجتماعي الجديدة التي ستغير طريقة تفاعلنا. #TalkApp #AI #Innovation', 0, 0, 0, NOW()),
-  ('10000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Talk is not just another social media platform. It''s built with AI at its core to create meaningful connections. Welcome to the future! 🌟 #TalkApp #ArtificialIntelligence', 0, 0, 0, NOW() - INTERVAL '2 hours'),
-  ('10000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'مرحباً بكم في Talk! 🎉 المنصة التي ستعيد تعريف التواصل الاجتماعي. انضموا إلينا في هذه الرحلة المثيرة! #Welcome #TalkApp #SocialMedia', 0, 0, 0, NOW() - INTERVAL '1 hour')
-ON CONFLICT (id) DO NOTHING;
+-- Create some initial posts for Assem
+INSERT INTO public.posts (
+  id,
+  user_id,
+  content,
+  image_urls,
+  video_url,
+  poll_id,
+  likes_count,
+  comments_count,
+  reposts_count,
+  created_at,
+  updated_at
+) VALUES 
+(
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000001',
+  'Just launched Talk! 🚀 The future of social media is here. What do you think? #TalkApp #SocialMedia #Innovation',
+  NULL,
+  NULL,
+  NULL,
+  1243,
+  45,
+  23,
+  NOW() - INTERVAL '2 hours',
+  NOW() - INTERVAL '2 hours'
+),
+(
+  '00000000-0000-0000-0000-000000000002',
+  '00000000-0000-0000-0000-000000000001',
+  'Building something amazing with AI and modern web technologies. The possibilities are endless! 💡 #AI #WebDev #TechStartup',
+  NULL,
+  NULL,
+  NULL,
+  3567,
+  128,
+  89,
+  NOW() - INTERVAL '5 hours',
+  NOW() - INTERVAL '5 hours'
+),
+(
+  '00000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000001',
+  'Welcome to Talk! 🎉 Connect, share, and discover amazing content. Let''s build this community together! #Welcome #Community',
+  NULL,
+  NULL,
+  NULL,
+  2891,
+  67,
+  156,
+  NOW() - INTERVAL '8 hours',
+  NOW() - INTERVAL '8 hours'
+) ON CONFLICT (id) DO UPDATE SET
+  content = EXCLUDED.content,
+  likes_count = EXCLUDED.likes_count,
+  comments_count = EXCLUDED.comments_count,
+  reposts_count = EXCLUDED.reposts_count,
+  updated_at = NOW();
 
--- Link hashtags to posts
-INSERT INTO post_hashtags (post_id, hashtag_id) 
-SELECT p.id, h.id 
-FROM posts p, hashtags h 
-WHERE (p.content LIKE '%#' || h.name || '%')
-ON CONFLICT DO NOTHING;
+-- Create Talk official account
+INSERT INTO public.profiles (
+  id,
+  username,
+  full_name,
+  bio,
+  title,
+  avatar_url,
+  banner_url,
+  birth_date,
+  verified,
+  followers_count,
+  following_count,
+  posts_count,
+  created_at,
+  updated_at
+) VALUES (
+  '00000000-0000-0000-0000-000000000002',
+  'talk',
+  'Talk',
+  'Official Talk App Account 🚀 | The future of social media',
+  'Public Figure',
+  '/talk-logo.png',
+  NULL,
+  NULL,
+  true,
+  50000,
+  0,
+  1,
+  NOW(),
+  NOW()
+) ON CONFLICT (id) DO UPDATE SET
+  username = EXCLUDED.username,
+  full_name = EXCLUDED.full_name,
+  bio = EXCLUDED.bio,
+  verified = EXCLUDED.verified,
+  updated_at = NOW();
+
+-- Create a welcome post from Talk account
+INSERT INTO public.posts (
+  id,
+  user_id,
+  content,
+  image_urls,
+  video_url,
+  poll_id,
+  likes_count,
+  comments_count,
+  reposts_count,
+  created_at,
+  updated_at
+) VALUES (
+  '00000000-0000-0000-0000-000000000004',
+  '00000000-0000-0000-0000-000000000002',
+  'Welcome to Talk! 🎉 We''re excited to have you join our community. Share your thoughts, connect with others, and discover amazing content! #Welcome #TalkApp',
+  NULL,
+  NULL,
+  NULL,
+  5000,
+  200,
+  300,
+  NOW() - INTERVAL '1 day',
+  NOW() - INTERVAL '1 day'
+) ON CONFLICT (id) DO NOTHING;
+
+-- Grant necessary permissions
+GRANT ALL ON public.profiles TO authenticated;
+GRANT ALL ON public.posts TO authenticated;
+GRANT ALL ON public.comments TO authenticated;
+GRANT ALL ON public.saved_posts TO authenticated;
+GRANT ALL ON public.polls TO authenticated;
