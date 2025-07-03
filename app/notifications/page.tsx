@@ -1,85 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent } from "@/components/ui/card"
-import { ArrowLeft, Heart, MessageCircle, UserPlus, Repeat2 } from "lucide-react"
+import { ArrowLeft, Bell } from "lucide-react"
 import { BottomNavigation } from "@/components/bottom-navigation"
-import { VerificationBadge } from "@/components/verification-badge"
 import { useRouter } from "next/navigation"
-
-const notifications = [
-  {
-    id: 1,
-    type: "like",
-    user: {
-      name: "Sarah Wilson",
-      username: "sarah",
-      avatar: "/placeholder.svg?height=40&width=40",
-      verified: false,
-    },
-    content: "liked your post",
-    post: "Just launched the beta version of Talk!",
-    timestamp: "2m",
-    read: false,
-  },
-  {
-    id: 2,
-    type: "follow",
-    user: {
-      name: "Tech Insider",
-      username: "techinsider",
-      avatar: "/placeholder.svg?height=40&width=40",
-      verified: true,
-    },
-    content: "started following you",
-    timestamp: "1h",
-    read: false,
-  },
-  {
-    id: 3,
-    type: "comment",
-    user: {
-      name: "John Doe",
-      username: "john",
-      avatar: "/placeholder.svg?height=40&width=40",
-      verified: false,
-    },
-    content: "commented on your post",
-    post: "AI advancements are changing how we interact...",
-    timestamp: "3h",
-    read: true,
-  },
-  {
-    id: 4,
-    type: "repost",
-    user: {
-      name: "Design Hub",
-      username: "designhub",
-      avatar: "/placeholder.svg?height=40&width=40",
-      verified: false,
-    },
-    content: "reposted your post",
-    post: "Share your thoughts...",
-    timestamp: "5h",
-    read: true,
-  },
-]
-
-const getNotificationIcon = (type: string) => {
-  switch (type) {
-    case "like":
-      return <Heart className="h-4 w-4 text-red-500" />
-    case "comment":
-      return <MessageCircle className="h-4 w-4 text-blue-500" />
-    case "follow":
-      return <UserPlus className="h-4 w-4 text-green-500" />
-    case "repost":
-      return <Repeat2 className="h-4 w-4 text-purple-500" />
-    default:
-      return null
-  }
-}
 
 export default function NotificationsPage() {
   const router = useRouter()
@@ -120,42 +44,20 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      {/* Notifications List */}
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-3">
-        {notifications.map((notification) => (
-          <Card
-            key={notification.id}
-            className={`post-card cursor-pointer transition-all ${!notification.read ? "ring-2 ring-blue-500/20" : ""}`}
-          >
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <div className="relative">
-                  <Avatar className="w-10 h-10">
-                    <AvatarImage src={notification.user.avatar || "/placeholder.svg"} />
-                    <AvatarFallback>{notification.user.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1">
-                    {getNotificationIcon(notification.type)}
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium">{notification.user.name}</span>
-                    {notification.user.verified && <VerificationBadge />}
-                    <span className="text-sm text-muted-foreground">@{notification.user.username}</span>
-                    <span className="text-sm text-muted-foreground">·</span>
-                    <span className="text-sm text-muted-foreground">{notification.timestamp}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-1">{notification.content}</p>
-                  {notification.post && (
-                    <p className="text-sm text-foreground bg-muted/50 rounded p-2 mt-2">"{notification.post}"</p>
-                  )}
-                </div>
-                {!notification.read && <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2" />}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Empty State */}
+      <div className="max-w-4xl mx-auto px-4 py-16">
+        <div className="text-center">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-muted/50 flex items-center justify-center">
+            <Bell className="h-12 w-12 text-muted-foreground" />
+          </div>
+          <h2 className="text-2xl font-semibold mb-2">No notifications yet</h2>
+          <p className="text-muted-foreground mb-6">
+            When someone likes, comments, or follows you, you'll see it here.
+          </p>
+          <Button onClick={() => router.push("/")} className="liquid-button gradient-bg text-white rounded-full px-6">
+            Back to Home
+          </Button>
+        </div>
       </div>
 
       <BottomNavigation />

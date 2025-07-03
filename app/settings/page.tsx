@@ -129,10 +129,14 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                <span>Dark Mode</span>
+                <div>
+                  <span className="font-medium">Night Mode</span>
+                  <p className="text-sm text-muted-foreground">Switch between light and dark themes</p>
+                </div>
               </div>
               <Switch checked={theme === "dark"} onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")} />
             </div>
+            <Separator />
             <Button variant="secondary" className="w-full justify-start">
               <Smartphone className="h-4 w-4 mr-3" />
               Display Settings

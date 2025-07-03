@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
   Heart,
   MessageCircle,
@@ -191,7 +190,7 @@ export default function HomePage() {
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <Avatar className="w-16 h-16">
-                  <AvatarImage src={selectedPost.profiles?.avatar_url || "/talk-logo-new.png"} />
+                  <AvatarImage src={selectedPost.profiles?.avatar_url || "/assem-profile.jpg"} />
                   <AvatarFallback>{selectedPost.profiles?.full_name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
@@ -281,16 +280,23 @@ export default function HomePage() {
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b">
         <div className="flex items-center justify-between p-4 max-w-6xl mx-auto">
-          <Image src="/talk-logo-new.png" alt="Talk" width={48} height={48} className="rounded-xl" priority />
+          {/* Logo on the left - bigger size */}
+          <div className="flex items-center gap-3">
+            <Image src="/talk-logo-new.png" alt="Talk" width={56} height={56} className="rounded-2xl" priority />
+            <div className="hidden sm:block">
+              <h1 className="text-xl font-bold gradient-text">Talk</h1>
+            </div>
+          </div>
+
+          {/* Notifications on the right */}
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
-              className="liquid-button relative rounded-full"
+              className="liquid-button rounded-full"
               onClick={() => (window.location.href = "/notifications")}
             >
               <Bell className="h-5 w-5" />
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-red-500">5</Badge>
             </Button>
           </div>
         </div>
@@ -303,8 +309,8 @@ export default function HomePage() {
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <Avatar className="w-12 h-12">
-                <AvatarImage src="/talk-logo-new.png" />
-                <AvatarFallback>YU</AvatarFallback>
+                <AvatarImage src="/assem-profile.jpg" />
+                <AvatarFallback>AS</AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <Input
@@ -354,7 +360,7 @@ export default function HomePage() {
             <CardContent className="p-6" onClick={() => setSelectedPost(post)}>
               <div className="flex items-start gap-4">
                 <Avatar className="w-12 h-12">
-                  <AvatarImage src={post.profiles?.avatar_url || "/talk-logo-new.png"} />
+                  <AvatarImage src={post.profiles?.avatar_url || "/assem-profile.jpg"} />
                   <AvatarFallback>{post.profiles?.full_name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
