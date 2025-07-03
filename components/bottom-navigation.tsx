@@ -19,10 +19,13 @@ export function BottomNavigation() {
   ]
 
   const currentIndex = navItems.findIndex((item) => item.path === pathname)
+  const isMainNavPage = currentIndex !== -1
 
   useEffect(() => {
-    setIndicatorPosition(currentIndex * 56) // 56px is button width + gap
-  }, [currentIndex])
+    if (isMainNavPage) {
+      setIndicatorPosition(currentIndex * 56) // 56px is button width + gap
+    }
+  }, [currentIndex, isMainNavPage])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -45,14 +48,17 @@ export function BottomNavigation() {
   return (
     <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50 mb-6">
       <div className="liquid-nav rounded-full p-3 w-fit relative">
-        <div
-          className="nav-indicator"
-          style={{
-            transform: `translateX(${indicatorPosition}px)`,
-            left: "12px",
-            top: "12px",
-          }}
-        />
+        {/* Only show indicator on main nav pages */}
+        {isMainNavPage && (
+          <div
+            className="nav-indicator"
+            style={{
+              transform: `translateX(${indicatorPosition}px)`,
+              left: "12px",
+              top: "12px",
+            }}
+          />
+        )}
         <div className="flex items-center gap-2 relative z-10">
           {navItems.map((item, index) => {
             const Icon = item.icon

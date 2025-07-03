@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
 import {
   ArrowLeft,
   Settings,
@@ -21,6 +22,9 @@ import {
   ZoomIn,
   ZoomOut,
   Crop,
+  Move,
+  Save,
+  Upload,
 } from "lucide-react"
 import { BottomNavigation } from "@/components/bottom-navigation"
 import { VerificationBadge } from "@/components/verification-badge"
@@ -31,24 +35,41 @@ export default function ProfilePage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("posts")
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isBannerEditOpen, setIsBannerEditOpen] = useState(false)
   const [isImageEditOpen, setIsImageEditOpen] = useState(false)
   const [editingImage, setEditingImage] = useState<"profile" | "banner" | null>(null)
+  const [bannerSettings, setBannerSettings] = useState({
+    zoom: 100,
+    rotation: 0,
+    x: 0,
+    y: 0,
+  })
   const [profileData, setProfileData] = useState({
     name: "Assem Sabry",
     username: "@assem",
-    bio: "I Made It.",
+    bio: "Founder & CEO of Talk 🚀 Building the future of social media",
     joinDate: "July 2025",
-    followers: 0,
-    following: 0,
+    followers: 1250,
+    following: 180,
   })
 
   const handleEditProfile = () => {
     setIsEditModalOpen(true)
   }
 
+  const handleBannerEdit = () => {
+    setIsBannerEditOpen(true)
+  }
+
   const handleImageEdit = (type: "profile" | "banner") => {
     setEditingImage(type)
     setIsImageEditOpen(true)
+  }
+
+  const handleBannerSave = () => {
+    // Here you would save the banner settings to your backend
+    console.log("Saving banner with settings:", bannerSettings)
+    setIsBannerEditOpen(false)
   }
 
   return (
@@ -96,11 +117,19 @@ export default function ProfilePage() {
       {/* Profile Content */}
       <div className="max-w-4xl mx-auto">
         {/* Banner */}
-        <div className="relative h-64 gradient-bg">
-          <Image src="/placeholder.svg?height=256&width=1024" alt="Profile Banner" fill className="object-cover" />
+        <div className="relative h-64">
+          <Image
+            src="/assem-banner.jpg"
+            alt="Profile Banner"
+            fill
+            className="object-cover"
+            style={{
+              transform: `scale(${bannerSettings.zoom / 100}) rotate(${bannerSettings.rotation}deg) translate(${bannerSettings.x}px, ${bannerSettings.y}px)`,
+            }}
+          />
           <Button
-            onClick={() => handleImageEdit("banner")}
-            className="absolute bottom-4 right-4 liquid-button rounded-full"
+            onClick={handleBannerEdit}
+            className="absolute bottom-4 right-4 water-button rounded-full"
             size="icon"
           >
             <Camera className="h-4 w-4" />
@@ -113,12 +142,12 @@ export default function ProfilePage() {
           <div className="relative -mt-20 mb-6 flex justify-center">
             <div className="relative">
               <Avatar className="w-40 h-40 border-4 border-background shadow-xl">
-                <AvatarImage src="/placeholder.svg?height=160&width=160" />
+                <AvatarImage src="/assem-profile.jpg" />
                 <AvatarFallback className="text-4xl">AS</AvatarFallback>
               </Avatar>
               <Button
                 onClick={() => handleImageEdit("profile")}
-                className="absolute bottom-2 right-2 liquid-button rounded-full"
+                className="absolute bottom-2 right-2 water-button rounded-full"
                 size="icon"
               >
                 <Camera className="h-4 w-4" />
@@ -129,7 +158,7 @@ export default function ProfilePage() {
           {/* User Info - Centered */}
           <div className="space-y-4 max-w-md mx-auto">
             <div className="flex items-center justify-center gap-3">
-              <h1 className="text-3xl font-bold gradient-text">{profileData.name}</h1>
+              <h1 className="text-3xl font-bold profile-name-gradient">{profileData.name}</h1>
               <VerificationBadge />
             </div>
 
@@ -145,7 +174,7 @@ export default function ProfilePage() {
             {/* Stats - Centered */}
             <div className="flex items-center justify-center gap-8 pt-4">
               <div className="text-center">
-                <div className="font-bold text-2xl gradient-text">{profileData.followers}</div>
+                <div className="font-bold text-2xl gradient-text">{profileData.followers.toLocaleString()}</div>
                 <div className="text-sm text-muted-foreground">Followers</div>
               </div>
               <div className="text-center">
@@ -155,9 +184,9 @@ export default function ProfilePage() {
             </div>
 
             {/* Edit Button */}
-            <Button onClick={handleEditProfile} className="liquid-button gradient-bg text-white rounded-full px-8 mt-6">
+            <Button onClick={handleEditProfile} className="water-button rounded-full px-8 mt-6">
               <Edit className="h-4 w-4 mr-2" />
-              Edit Profile
+              <span className="water-text">Edit Profile</span>
             </Button>
           </div>
         </div>
@@ -236,8 +265,109 @@ export default function ProfilePage() {
               <Button onClick={() => setIsEditModalOpen(false)} variant="outline" className="flex-1">
                 Cancel
               </Button>
-              <Button onClick={() => setIsEditModalOpen(false)} className="liquid-button gradient-bg text-white flex-1">
-                Save
+              <Button onClick={() => setIsEditModalOpen(false)} className="water-button flex-1">
+                <span className="water-text">Save</span>
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Banner Edit Modal */}
+      <Dialog open={isBannerEditOpen} onOpenChange={setIsBannerEditOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Banner</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* Banner Preview */}
+            <div className="relative h-48 bg-muted rounded-lg overflow-hidden">
+              <Image
+                src="/assem-banner.jpg"
+                alt="Banner Preview"
+                fill
+                className="object-cover"
+                style={{
+                  transform: `scale(${bannerSettings.zoom / 100}) rotate(${bannerSettings.rotation}deg) translate(${bannerSettings.x}px, ${bannerSettings.y}px)`,
+                }}
+              />
+            </div>
+
+            {/* Controls */}
+            <div className="space-y-4">
+              <div>
+                <Label>Zoom: {bannerSettings.zoom}%</Label>
+                <Slider
+                  value={[bannerSettings.zoom]}
+                  onValueChange={(value) => setBannerSettings((prev) => ({ ...prev, zoom: value[0] }))}
+                  min={50}
+                  max={200}
+                  step={5}
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label>Rotation: {bannerSettings.rotation}°</Label>
+                <Slider
+                  value={[bannerSettings.rotation]}
+                  onValueChange={(value) => setBannerSettings((prev) => ({ ...prev, rotation: value[0] }))}
+                  min={-180}
+                  max={180}
+                  step={5}
+                  className="mt-2"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Horizontal Position</Label>
+                  <Slider
+                    value={[bannerSettings.x]}
+                    onValueChange={(value) => setBannerSettings((prev) => ({ ...prev, x: value[0] }))}
+                    min={-100}
+                    max={100}
+                    step={5}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label>Vertical Position</Label>
+                  <Slider
+                    value={[bannerSettings.y]}
+                    onValueChange={(value) => setBannerSettings((prev) => ({ ...prev, y: value[0] }))}
+                    min={-100}
+                    max={100}
+                    step={5}
+                    className="mt-2"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2 justify-center">
+              <Button variant="outline" size="icon" className="water-button rounded-full bg-transparent">
+                <Upload className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" className="water-button rounded-full bg-transparent">
+                <Crop className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" className="water-button rounded-full bg-transparent">
+                <RotateCw className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" className="water-button rounded-full bg-transparent">
+                <Move className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="flex gap-2">
+              <Button onClick={() => setIsBannerEditOpen(false)} variant="outline" className="flex-1">
+                Cancel
+              </Button>
+              <Button onClick={handleBannerSave} className="water-button flex-1">
+                <Save className="h-4 w-4 mr-2" />
+                <span className="water-text">Save Banner</span>
               </Button>
             </div>
           </div>
@@ -255,16 +385,16 @@ export default function ProfilePage() {
               <p className="text-muted-foreground">Image preview will appear here</p>
             </div>
             <div className="flex gap-2 justify-center">
-              <Button variant="outline" size="icon" className="liquid-button rounded-full bg-transparent">
+              <Button variant="outline" size="icon" className="water-button rounded-full bg-transparent">
                 <Crop className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" className="liquid-button rounded-full bg-transparent">
+              <Button variant="outline" size="icon" className="water-button rounded-full bg-transparent">
                 <RotateCw className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" className="liquid-button rounded-full bg-transparent">
+              <Button variant="outline" size="icon" className="water-button rounded-full bg-transparent">
                 <ZoomIn className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" className="liquid-button rounded-full bg-transparent">
+              <Button variant="outline" size="icon" className="water-button rounded-full bg-transparent">
                 <ZoomOut className="h-4 w-4" />
               </Button>
             </div>
@@ -272,8 +402,8 @@ export default function ProfilePage() {
               <Button onClick={() => setIsImageEditOpen(false)} variant="outline" className="flex-1">
                 Cancel
               </Button>
-              <Button onClick={() => setIsImageEditOpen(false)} className="liquid-button gradient-bg text-white flex-1">
-                Save
+              <Button onClick={() => setIsImageEditOpen(false)} className="water-button flex-1">
+                <span className="water-text">Save</span>
               </Button>
             </div>
           </div>

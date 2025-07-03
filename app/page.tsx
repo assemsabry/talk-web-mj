@@ -280,12 +280,9 @@ export default function HomePage() {
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b">
         <div className="flex items-center justify-between p-4 max-w-6xl mx-auto">
-          {/* Logo on the left - bigger size */}
-          <div className="flex items-center gap-3">
-            <Image src="/talk-logo-new.png" alt="Talk" width={56} height={56} className="rounded-2xl" priority />
-            <div className="hidden sm:block">
-              <h1 className="text-xl font-bold gradient-text">Talk</h1>
-            </div>
+          {/* Logo only - bigger size */}
+          <div className="flex items-center">
+            <Image src="/talk-logo-new.png" alt="Talk" width={64} height={64} className="rounded-2xl" priority />
           </div>
 
           {/* Notifications on the right */}

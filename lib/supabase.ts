@@ -143,11 +143,12 @@ export type Database = {
   }
 }
 
-// Fallback data when Supabase is not configured - All in English
+// Fallback data - Spanish and English posts only
 export const fallbackPosts = [
   {
     id: "1",
-    content: "Just launched the beta version of Talk! Excited to hear your feedback. #TalkApp #SocialMedia",
+    content:
+      "¡Acabo de lanzar la versión beta de Talk! Emocionado de escuchar sus comentarios. #TalkApp #RedesSociales",
     created_at: new Date().toISOString(),
     likes_count: 1243,
     comments_count: 45,
@@ -183,7 +184,7 @@ export const fallbackPosts = [
   {
     id: "3",
     content:
-      "Welcome to Talk! 🎉 The new era of social networking begins now. Connect, share, and discover amazing content! #Welcome #TalkApp",
+      "¡Bienvenidos a Talk! 🎉 La nueva era de las redes sociales comienza ahora. ¡Conecta, comparte y descubre contenido increíble! #Bienvenidos #TalkApp",
     created_at: new Date(Date.now() - 7200000).toISOString(),
     likes_count: 2891,
     comments_count: 67,
@@ -198,6 +199,42 @@ export const fallbackPosts = [
       verified: true,
     },
   },
+  {
+    id: "4",
+    content:
+      "The power of connection is limitless. Every conversation starts with a single message. What will yours be? #Connect #Community",
+    created_at: new Date(Date.now() - 10800000).toISOString(),
+    likes_count: 1567,
+    comments_count: 89,
+    reposts_count: 45,
+    image_urls: null,
+    video_url: null,
+    poll_data: null,
+    profiles: {
+      username: "assem",
+      full_name: "Assem Sabry",
+      avatar_url: "/assem-profile.jpg",
+      verified: true,
+    },
+  },
+  {
+    id: "5",
+    content:
+      "La tecnología debe servir a la humanidad, no al revés. Construyamos un futuro digital más humano. 💙 #Tecnología #Futuro",
+    created_at: new Date(Date.now() - 14400000).toISOString(),
+    likes_count: 2234,
+    comments_count: 156,
+    reposts_count: 78,
+    image_urls: null,
+    video_url: null,
+    poll_data: null,
+    profiles: {
+      username: "assem",
+      full_name: "Assem Sabry",
+      avatar_url: "/assem-profile.jpg",
+      verified: true,
+    },
+  },
 ]
 
 export const fallbackProfiles = [
@@ -207,7 +244,7 @@ export const fallbackProfiles = [
     full_name: "Assem Sabry",
     bio: "Founder & CEO of Talk 🚀 Building the future of social media",
     avatar_url: "/assem-profile.jpg",
-    banner_url: null,
+    banner_url: "/assem-banner.jpg",
     verified: true,
     followers_count: 1250,
     following_count: 180,
