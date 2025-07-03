@@ -1,0 +1,253 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 262 83% 58%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 95%;
+    --card: 20 14.3% 4.1%;
+    --card-foreground: 0 0% 95%;
+    --popover: 20 14.3% 4.1%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 12 6.5% 15.1%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 12 6.5% 15.1%;
+    --muted-foreground: 24 5.4% 63.9%;
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 0 0% 95%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 12 6.5% 15.1%;
+    --input: 12 6.5% 15.1%;
+    --ring: 262 83% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.liquid-nav {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 58, 138, 0.2) 0%,
+    rgba(91, 33, 182, 0.2) 25%,
+    rgba(157, 23, 77, 0.2) 50%,
+    rgba(180, 83, 9, 0.2) 75%,
+    rgba(21, 128, 61, 0.2) 100%
+  );
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.liquid-button {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 58, 138, 0.25) 0%,
+    rgba(91, 33, 182, 0.25) 50%,
+    rgba(180, 83, 9, 0.25) 100%
+  );
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.liquid-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 58, 138, 0.35) 0%,
+    rgba(91, 33, 182, 0.35) 50%,
+    rgba(180, 83, 9, 0.35) 100%
+  );
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #1e3a8a 0%, #5b21b6 25%, #9d1777 50%, #b45309 75%, #15803d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #1e3a8a 0%, #5b21b6 25%, #9d1777 50%, #b45309 75%);
+}
+
+.hashtag-gradient {
+  background: linear-gradient(135deg, #1e3a8a 0%, #5b21b6 50%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.active-nav-glow {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.7) 0%, rgba(91, 33, 182, 0.7) 50%, rgba(180, 83, 9, 0.7) 100%);
+  box-shadow: 0 0 25px rgba(30, 58, 138, 0.6);
+  animation: float-glow 3s ease-in-out infinite;
+}
+
+.nav-indicator {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.8) 0%, rgba(91, 33, 182, 0.8) 50%, rgba(180, 83, 9, 0.8) 100%);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 20px rgba(30, 58, 138, 0.5);
+  z-index: -1;
+}
+
+@keyframes float-glow {
+  0%,
+  100% {
+    transform: translateY(0px);
+    box-shadow: 0 0 25px rgba(30, 58, 138, 0.6);
+  }
+  50% {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(91, 33, 182, 0.8);
+  }
+}
+
+.post-card {
+  @apply bg-card border-0 shadow-lg;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .post-card {
+  background: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(40, 40, 40, 0.7) 100%);
+}
+
+.reaction-button {
+  @apply transition-all duration-300 hover:scale-110;
+}
+
+@keyframes pulse-logo {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.pulse-logo {
+  animation: pulse-logo 2s ease-in-out infinite;
+}
+
+.floating-bubbles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: float 6s ease-in-out infinite;
+}
+
+.bubble:nth-child(1) {
+  background: linear-gradient(135deg, #1e3a8a, #5b21b6);
+}
+.bubble:nth-child(2) {
+  background: linear-gradient(135deg, #9d1777, #b45309);
+}
+.bubble:nth-child(3) {
+  background: linear-gradient(135deg, #15803d, #0891b2);
+}
+.bubble:nth-child(4) {
+  background: linear-gradient(135deg, #d97706, #dc2626);
+}
+.bubble:nth-child(5) {
+  background: linear-gradient(135deg, #7c3aed, #0891b2);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-20px) rotate(120deg);
+  }
+  66% {
+    transform: translateY(10px) rotate(240deg);
+  }
+}
+
+.reaction-popup {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.dark .reaction-popup {
+  background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(40, 40, 40, 0.85) 100%);
+}
+
+.mention {
+  color: #1e3a8a;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.mention:hover {
+  text-decoration: underline;
+}
+
+.hashtag {
+  color: #5b21b6;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.hashtag:hover {
+  text-decoration: underline;
+}
